@@ -1,6 +1,6 @@
 from flask import request
 from flask_restful import Resource
-from Model import db, Presence, PresenceSchema, Etudiants, EtudiantSchema, Salles
+from Model import db, Presence, PresenceSchema, Etudiants, EtudiantSchema, Salles, Session
 
 presences_schema = PresenceSchema(many=True)
 presence_schema = PresenceSchema()
@@ -10,7 +10,8 @@ etudiant_schema = EtudiantSchema()
 
 class PresenceResource(Resource):
     def get(self):
-        presences = Presence.query.all()
+        session = request.args['session_id']
+        presences = Presence.query.filter_by(session_id=session)
         presences = presences_schema.dump(presences).data
         return {'status': 'success1', 'data': presences}, 200
 
