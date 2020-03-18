@@ -12,7 +12,7 @@ class PresenceResource(Resource):
     def get(self):
         presences = Presence.query.all()
         presences = presences_schema.dump(presences).data
-        return {'status': 'success', 'data': presences}, 200
+        return {'status': 'success1', 'data': presences}, 200
 
     def post(self):
         json_data = request.get_json(force=True)
@@ -22,22 +22,23 @@ class PresenceResource(Resource):
         data, errors = presence_schema.load(json_data)
         if errors:
             return errors, 422
-        uuid = Salle.query.filter_by(uuid=data['uuid']).first()
+        uuid = Salles.query.filter_by(uuid=data['uuid']).first()
         if not uuid:
             return {'message': 'UUID invalide'}, 400
-        etudiant = Etudiants.query.filter_by(id=data['etudiant_id'])
-        etudiant.mac_address = str(date['mac_address'])
+        etudiant = Etudiants.query.filter_by(id=json_data['etudiant_id'])
+        etudiant.mac_address = json_data['mac_address']
+        db.session.commit()
 
         presence = Presence(
             session_id=json_data['session_id'],
             etudiant_id=json_data['etudiant_id'],
-            date_message=json_data['date']
+            date_message=json_data['date_message']
             )
         
         db.session.add(presence)
         db.session.commit()
 
-        result = presene_schema.dump(presence).data
+        result = presence_schema.dump(presence).data
 
         return { "status": 'success', 'data': result }, 201
 

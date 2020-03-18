@@ -17,8 +17,8 @@ class Etudiants(db.Model):
     prenom = db.Column(db.String(45), nullable=False)
     nom = db.Column(db.String(45), nullable=False)
     mac_address = db.Column(db.String(48))
-    presence = db.relationship('presence', backref='etudiant_id')
-    absence = db.relationship('absence', backref='etudiant_id')
+    presence = db.relationship('Presence', backref='presence_etudiants')
+    absence = db.relationship('Absence', backref='absence_etudiants')
     
 
     def __init__(self, prenom, nom):
@@ -31,7 +31,7 @@ class Enseignants(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     prenom = db.Column(db.String(45), nullable=False)
     nom = db.Column(db.String(45), nullable=False)
-    lecon = db.relationship('lecons', backref='enseignant_id')
+    lecon = db.relationship('Lecons', backref='lecon_enseignant')
 
     def __init__(self, prenom, nom):
         self.prenom = prenom
@@ -42,7 +42,7 @@ class Lecons(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sujet = db.Column(db.String(45), nullable=False)
     enseignant_id = db.Column(db.Integer, db.ForeignKey('enseignants.id'))
-    session = db.relationship('session', backref='lecons_id')
+    session = db.relationship('Session', backref='session_lecons')
 
     def __init__(self, sujet, enseignant_id):
         self.sujet = sujet
@@ -53,7 +53,7 @@ class Salles(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(db.String(128)) #ou db.Column(UUID(as_uuid=True), unique=True, nullable=False)
     nom_salle = db.Column(db.String(45), nullable=False)
-    session = db.relationship('session', backref='salles_id')
+    session = db.relationship('Session', backref='session_salles')
 
     def __init__(self, diffuseur_uuid, nom_salle):
         self.diffuseur_uuid = diffuseur_uuid
@@ -64,10 +64,10 @@ class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     lecons_id = db.Column(db.Integer, db.ForeignKey('lecons.id'), nullable=False)
     salles_id = db.Column(db.Integer, db.ForeignKey('salles.id'), nullable=False)
-    date_debut = db.Column(db.TIMESTAMP, nullable=False)
-    date_fin = db.Column(db.TIMESTAMP, nullable=False)
-    presence = db.relationship('presence', backref='session_id')
-    absence = db.relationship('absence', backref='session_id')
+    date_debut = db.Column(db.DATETIME, nullable=False)
+    date_fin = db.Column(db.DATETIME, nullable=False)
+    presence = db.relationship('Presence', backref='presence_session')
+    absence = db.relationship('Absence', backref='absence_session')
 
     def __init__(self, date_debut, date_fin):
         self.date_debut = date_debut
@@ -75,14 +75,17 @@ class Session(db.Model):
 
 class Presence(db.Model):
     __tablename__ = 'presence'
-    session_id = db.Column(db.Integer, db.ForeignKey('session.id'), primary_key=True)
-    etudiant_id = db.Column(db.Integer, db.ForeignKey('etudiants.id'), primary_key=True)
-    date_message = db.Column(db.TIMESTAMP, nullable=False)
+    session_id = db.Column(db.Integer, db.ForeignKey('session.id') ,nullable=False)
+    etudiant_id = db.Column(db.Integer, db.ForeignKey('etudiants.id'),nullable=False)
+    date_message = db.Column(db.String, nullable=False)
+    __table_args__ = (
+        db.PrimaryKeyConstraint('etudiant_id', 'session_id'),
+        {},)
 
 class Absence(db.Model):
     __tablename__ = 'absence'
-    session_id = db.Column(db.Integer, db.ForeignKey('session.id'), primary_key=True)
-    etudiant_id = db.Column(db.Integer, db.ForeignKey('etudiants.id'), primary_key=True)
+    session_id = db.Column(db.Integer, db.ForeignKey('session.id'),nullable=False)
+    etudiant_id = db.Column(db.Integer, db.ForeignKey('etudiants.id'),primary_key=True)
 
 class EtudiantSchema(ma.Schema):
     mac_address = fields.String(required=True)
@@ -90,7 +93,7 @@ class EtudiantSchema(ma.Schema):
 class PresenceSchema(ma.Schema):
     session_id = fields.Integer(required=True)
     etudiant_id = fields.Integer(required=True)
-    date_message = fields.DateTime(required=True)
+    date_message = fields.String(required=True)
     uuid = fields.String(required=True)
     mac_address = fields.String(required=True)
 
