@@ -8,6 +8,7 @@ presence_schema = PresenceSchema()
 etudiants_schema = EtudiantSchema(many=True)
 etudiant_schema = EtudiantSchema()
 
+
 class PresenceResource(Resource):
     def get(self):
         session = request.args['session_id']

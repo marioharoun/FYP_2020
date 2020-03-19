@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: e10d69fbfd8d
+Revision ID: b3f78793ffe2
 Revises: 
-Create Date: 2020-03-17 03:06:26.410952
+Create Date: 2020-03-19 20:21:55.876751
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e10d69fbfd8d'
+revision = 'b3f78793ffe2'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -48,8 +48,8 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('lecons_id', sa.Integer(), nullable=False),
     sa.Column('salles_id', sa.Integer(), nullable=False),
-    sa.Column('date_debut', sa.TIMESTAMP(), nullable=False),
-    sa.Column('date_fin', sa.TIMESTAMP(), nullable=False),
+    sa.Column('date_debut', sa.DATETIME(), nullable=False),
+    sa.Column('date_fin', sa.DATETIME(), nullable=False),
     sa.ForeignKeyConstraint(['lecons_id'], ['lecons.id'], ),
     sa.ForeignKeyConstraint(['salles_id'], ['salles.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -59,12 +59,12 @@ def upgrade():
     sa.Column('etudiant_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['etudiant_id'], ['etudiants.id'], ),
     sa.ForeignKeyConstraint(['session_id'], ['session.id'], ),
-    sa.PrimaryKeyConstraint('session_id', 'etudiant_id')
+    sa.PrimaryKeyConstraint('etudiant_id')
     )
     op.create_table('presence',
     sa.Column('session_id', sa.Integer(), nullable=False),
     sa.Column('etudiant_id', sa.Integer(), nullable=False),
-    sa.Column('date_message', sa.TIMESTAMP(), nullable=False),
+    sa.Column('date_message', sa.String(), nullable=False),
     sa.ForeignKeyConstraint(['etudiant_id'], ['etudiants.id'], ),
     sa.ForeignKeyConstraint(['session_id'], ['session.id'], ),
     sa.PrimaryKeyConstraint('session_id', 'etudiant_id')

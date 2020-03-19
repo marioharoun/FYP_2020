@@ -5,11 +5,19 @@ from marshmallow import Schema, fields, pre_load, validate
 from sqlalchemy.dialects.postgresql import UUID
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
-
+from sqlalchemy.engine import Engine
+from sqlalchemy import event
 
 ma = Marshmallow()
 db = SQLAlchemy()
 
+##Pour assurer la dependance des cles etrangeres sur SQLite
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
+##
 
 class Etudiants(db.Model):
     __tablename__ = 'etudiants'
@@ -79,7 +87,7 @@ class Presence(db.Model):
     etudiant_id = db.Column(db.Integer, db.ForeignKey('etudiants.id'),nullable=False)
     date_message = db.Column(db.String, nullable=False)
     __table_args__ = (
-        db.PrimaryKeyConstraint('etudiant_id', 'session_id'),
+        db.PrimaryKeyConstraint('session_id','etudiant_id'),
         {},)
 
 class Absence(db.Model):
