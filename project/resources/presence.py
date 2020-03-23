@@ -11,10 +11,14 @@ etudiant_schema = EtudiantSchema()
 
 class PresenceResource(Resource):
     def get(self):
-        session = request.args['session_id']
-        presences = Presence.query.filter_by(session_id=session)
-        presences = presences_schema.dump(presences).data
-        return {'status': 'success1', 'data': presences}, 200
+        presences_data=[]
+        i=0
+        session=request.args.getlist('session_id')
+        for presences in session:
+            presences = Presence.query.filter_by(session_id=session[i])
+            presences_data.append(presences_schema.dump(presences).data)
+            i=i+1
+        return {'status': 'success1', 'data': presences_data}, 200
 
     def post(self):
         json_data = request.get_json(force=True)
@@ -27,7 +31,11 @@ class PresenceResource(Resource):
         uuid = Salles.query.filter_by(uuid=data['uuid']).first()
         if not uuid:
             return {'message': 'UUID invalide'}, 400
-        etudiant = Etudiants.query.filter_by(id=json_data['etudiant_id'])
+        
+        etudiant = Etudiants.query.filter_by(id=json_data['etudiant_id']).first()
+        if etudiant.mac_address != None and json_data['mac_address'] != etudiant.mac_address:
+            return {'message': 'Invalid device'}, 400
+        print(etudiant.mac_address)
         etudiant.mac_address = json_data['mac_address']
         db.session.commit()
 

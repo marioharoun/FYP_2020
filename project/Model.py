@@ -24,15 +24,9 @@ class Etudiants(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     prenom = db.Column(db.String(45), nullable=False)
     nom = db.Column(db.String(45), nullable=False)
-    mac_address = db.Column(db.String(48))
+    mac_address = db.Column(db.String(48), unique=True)
     presence = db.relationship('Presence', backref='presence_etudiants')
     absence = db.relationship('Absence', backref='absence_etudiants')
-    
-
-    def __init__(self, prenom, nom):
-        self.prenom = prenom
-        self.nom = nom
-
 
 class Enseignants(db.Model):
     __tablename__ = 'enseignants'
