@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 1007a445ee3a
+Revision ID: 1abdba7281ad
 Revises: 
-Create Date: 2020-03-23 19:11:45.247736
+Create Date: 2020-03-27 00:23:10.560937
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '1007a445ee3a'
+revision = '1abdba7281ad'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,15 +22,25 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('prenom', sa.String(length=45), nullable=False),
     sa.Column('nom', sa.String(length=45), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.Column('public_id', sa.String(length=50), nullable=True),
+    sa.Column('password', sa.String(length=80), nullable=True),
+    sa.Column('email', sa.String(length=80), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email'),
+    sa.UniqueConstraint('public_id')
     )
     op.create_table('etudiants',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('prenom', sa.String(length=45), nullable=False),
     sa.Column('nom', sa.String(length=45), nullable=False),
+    sa.Column('public_id', sa.String(length=50), nullable=True),
+    sa.Column('password', sa.String(length=80), nullable=True),
+    sa.Column('email', sa.String(length=80), nullable=True),
     sa.Column('mac_address', sa.String(length=48), nullable=True),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('mac_address')
+    sa.UniqueConstraint('email'),
+    sa.UniqueConstraint('mac_address'),
+    sa.UniqueConstraint('public_id')
     )
     op.create_table('salles',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -49,8 +59,8 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('lecons_id', sa.Integer(), nullable=False),
     sa.Column('salles_id', sa.Integer(), nullable=False),
-    sa.Column('date_debut', sa.DATETIME(), nullable=False),
-    sa.Column('date_fin', sa.DATETIME(), nullable=False),
+    sa.Column('date_debut', sa.Date(), nullable=False),
+    sa.Column('date_fin', sa.Date(), nullable=False),
     sa.ForeignKeyConstraint(['lecons_id'], ['lecons.id'], ),
     sa.ForeignKeyConstraint(['salles_id'], ['salles.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -65,7 +75,7 @@ def upgrade():
     op.create_table('presence',
     sa.Column('session_id', sa.Integer(), nullable=False),
     sa.Column('etudiant_id', sa.Integer(), nullable=False),
-    sa.Column('date_message', sa.String(), nullable=False),
+    sa.Column('date_message', sa.Date(), nullable=False),
     sa.ForeignKeyConstraint(['etudiant_id'], ['etudiants.id'], ),
     sa.ForeignKeyConstraint(['session_id'], ['session.id'], ),
     sa.PrimaryKeyConstraint('session_id', 'etudiant_id')

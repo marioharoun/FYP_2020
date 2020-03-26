@@ -1,6 +1,7 @@
 from flask import request
 from flask_restful import Resource
 from Model import db, Presence, PresenceSchema, Etudiants, EtudiantSchema, Salles, Session
+from .Login import token_required
 
 presences_schema = PresenceSchema(many=True)
 presence_schema = PresenceSchema()
@@ -10,7 +11,10 @@ etudiant_schema = EtudiantSchema()
 
 
 class PresenceResource(Resource):
-    def get(self):
+    @token_required
+    def get(current_user, self):
+        if current_user[1]==False:
+            return {'message': 'Access Denied!'}, 403
         presences_data=[]
         i=0
         session=request.args.getlist('session_id')
@@ -20,7 +24,8 @@ class PresenceResource(Resource):
             i=i+1
         return {'status': 'success1', 'data': presences_data}, 200
 
-    def post(self):
+    @token_required
+    def post(current_user, self):
         json_data = request.get_json(force=True)
         if not json_data:
                return {'message': 'No input data provided'}, 400
@@ -40,9 +45,9 @@ class PresenceResource(Resource):
         db.session.commit()
 
         presence = Presence(
-            session_id=json_data['session_id'],
-            etudiant_id=json_data['etudiant_id'],
-            date_message=json_data['date_message']
+            session_id=data['session_id'],
+            etudiant_id=data['etudiant_id'],
+            date_message=data['date_message']
             )
         
         db.session.add(presence)
@@ -52,36 +57,36 @@ class PresenceResource(Resource):
 
         return { "status": 'success', 'data': result }, 201
 
-##    def put(self):
-##        json_data = request.get_json(force=True)
-##        if not json_data:
-##               return {'message': 'No input data provided'}, 400
-##        # Validate and deserialize input
-##        data, errors = category_schema.load(json_data)
-##        if errors:
-##            return errors, 422
-##        category = Category.query.filter_by(id=data['id']).first()
-##        if not category:
-##            return {'message': 'Category does not exist'}, 400
-##        category.name = data['name']
-##        db.session.commit()
-##
-##        result = category_schema.dump(category).data
-##
-##        return { "status": 'success', 'data': result }, 204
-##
-##    def delete(self):
-##        json_data = request.get_json(force=True)
-##        if not json_data:
-##               return {'message': 'No input data provided'}, 400
-##        # Validate and deserialize input
-##        data, errors = category_schema.load(json_data)
-##        if errors:
-##            return errors, 422
-##        category = Category.query.filter_by(id=data['id']).delete()
-##        db.session.commit()
-##
-##        result = category_schema.dump(category).data
-##
-##        return { "status": 'success', 'data': result}, 204
-##
+    def put(self):
+        json_data = request.get_json(force=True)
+        if not json_data:
+               return {'message': 'No input data provided'}, 400
+        # Validate and deserialize input
+        data, errors = category_schema.load(json_data)
+        if errors:
+            return errors, 422
+        category = Category.query.filter_by(id=data['id']).first()
+        if not category:
+            return {'message': 'Category does not exist'}, 400
+        category.name = data['name']
+        db.session.commit()
+
+        result = category_schema.dump(category).data
+
+        return { "status": 'success', 'data': result }, 204
+
+    def delete(self):
+        json_data = request.get_json(force=True)
+        if not json_data:
+               return {'message': 'No input data provided'}, 400
+        # Validate and deserialize input
+        data, errors = category_schema.load(json_data)
+        if errors:
+            return errors, 422
+        category = Category.query.filter_by(id=data['id']).delete()
+        db.session.commit()
+
+        result = category_schema.dump(category).data
+
+        return { "status": 'success', 'data': result}, 204
+

@@ -4,6 +4,8 @@ from flask_oauthlib.provider import OAuth2Provider
 from resources.Hello import Hello
 from resources.Presence import PresenceResource
 from resources.Absence import AbsenceResource
+from resources.Signup import SignupResource
+from resources.Login import LoginResource
 
 api_bp = Blueprint('api', __name__)
 api = Api(api_bp)
@@ -12,3 +14,17 @@ api = Api(api_bp)
 api.add_resource(Hello, '/Hello')
 api.add_resource(PresenceResource, '/Presence')
 api.add_resource(AbsenceResource, '/Absence')
+
+
+login_bp = Blueprint('login', __name__)
+login = Api(login_bp)
+
+# Route
+login.add_resource(LoginResource, '/')
+
+
+signup_bp = Blueprint('signup', __name__)
+signup = Api(signup_bp)
+
+# Route
+signup.add_resource(SignupResource,'/')
