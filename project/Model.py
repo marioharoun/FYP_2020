@@ -107,6 +107,19 @@ class SignupSchema(ma.Schema):
     password = fields.String(required=True)
     enseignant = fields.Boolean(required=True)
 
+class SessionSchema(ma.Schema):
+    id = fields.Integer()
+    salles_id = fields.Integer(required=True)
+    date_debut = fields.DateTime(required=True)
+    date_fin = fields.DateTime(required=True)
+    lecons_id = fields.Integer(required=True)
+
+class LeconSchema(ma.Schema):
+    id = fields.Integer()
+    sujet = fields.String(required=True)
+    enseignant_id = fields.Integer(required=True)
+
+
 class PresenceSchema(ma.Schema):
     session_id = fields.Integer(required=True)
     etudiant_id = fields.Integer(required=True)

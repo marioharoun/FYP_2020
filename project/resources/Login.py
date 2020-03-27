@@ -42,7 +42,7 @@ class LoginResource(Resource):
             return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm=Login required!'})
         if enseignant:
             if check_password_hash(enseignant.password, auth.password):
-                token = jwt.encode({'public_id' : enseignant.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=1)}, SECRET_KEY)
+                token = jwt.encode({'public_id' : enseignant.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, SECRET_KEY)
                 return {'token' : token.decode('UTF-8')}
         if etudiant:
             if check_password_hash(etudiant.password, auth.password):
