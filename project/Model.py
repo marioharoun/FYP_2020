@@ -28,6 +28,7 @@ class Etudiants(db.Model):
     password = db.Column(db.String(80))
     email = db.Column(db.String(80), unique=True)
     mac_address = db.Column(db.String(48), unique=True)
+    confirmation = db.Column(db.Boolean, unique=False, default=False)
     presence = db.relationship('Presence', backref='presence_etudiants')
     absence = db.relationship('Absence', backref='absence_etudiants')
 
@@ -39,6 +40,7 @@ class Enseignants(db.Model):
     public_id = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(80))
     email = db.Column(db.String(80), unique=True)
+    confirmation = db.Column(db.Boolean, unique=False, default=False)
     lecon = db.relationship('Lecons', backref='lecon_enseignant')
 
 class Lecons(db.Model):

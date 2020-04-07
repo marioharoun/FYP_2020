@@ -3,6 +3,7 @@ from flask_restful import Resource
 from werkzeug.security import generate_password_hash, check_password_hash
 from Model import db, Etudiants, EtudiantSchema, Enseignants, EnseignantSchema, SignupSchema
 import uuid
+from .ConfirmEmail import send_email
 
 signup_schema = SignupSchema()
 etudiant_schema = EtudiantSchema()
@@ -29,6 +30,7 @@ class SignupResource(Resource):
                 email = data['email']
                 )
             db.session.add(enseignant)
+            send_email(etudiant.email)
             db.session.commit()
             result = enseignant_schema.dump(enseignant).data
             return { "status": 'success', 'data': result }, 201
@@ -42,6 +44,7 @@ class SignupResource(Resource):
                 email = data['email']
                 )
             db.session.add(etudiant)
+            send_email(etudiant.email)
             db.session.commit()
             result = etudiant_schema.dump(etudiant).data
             return { "status": 'success', 'data': result }, 201

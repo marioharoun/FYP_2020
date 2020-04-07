@@ -8,6 +8,7 @@ from resources.Signup import SignupResource
 from resources.Login import LoginResource
 from resources.Createsession import CreatesessionResource
 from resources.Lecon import LeconResource
+from resources.ConfirmEmail import ConfirmEmailResource
 
 api_bp = Blueprint('api', __name__)
 api = Api(api_bp)
@@ -33,4 +34,10 @@ signup = Api(signup_bp)
 # Route
 signup.add_resource(SignupResource,'/')
 
+
+confirmation_bp = Blueprint('confirmation', __name__)
+confirmation = Api(confirmation_bp)
+
+# Route
+confirmation.add_resource(ConfirmEmailResource,'/')
 
