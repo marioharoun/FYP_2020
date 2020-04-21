@@ -6,11 +6,12 @@ def create_app(config_filename):
     app = Flask(__name__)
     app.config.from_object(config_filename)
         
-    from app import api_bp, signup_bp, login_bp, confirmation_bp
+    from app import api_bp, signup_bp, login_bp, confirmation_bp, diffuseur_bp
     app.register_blueprint(api_bp, url_prefix='/api')
     app.register_blueprint(login_bp, url_prefix='/login')
     app.register_blueprint(signup_bp, url_prefix='/signup')
     app.register_blueprint(confirmation_bp, url_prefix='/confirm_email')
+    app.register_blueprint(diffuseur_bp, url_prefix='/diffuseur')
 
     from resources.ConfirmEmail import mail
     mail.init_app(app)

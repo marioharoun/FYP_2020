@@ -21,6 +21,10 @@ class SignupResource(Resource):
         hashed_password = generate_password_hash(data['password'], method='sha256')
         
         if data['enseignant'] == True:
+##            try:
+##            Enseignants.try_login(id, password)
+##            except ldap.INVALID_CREDENTIALS:
+##                return {'ldap': 'Invalid Credentials!'}, 49
             enseignant = Enseignants(
                 id = data['id'],
                 prenom = data['prenom'],
@@ -30,11 +34,18 @@ class SignupResource(Resource):
                 email = data['email']
                 )
             db.session.add(enseignant)
-            send_email(etudiant.email)
+            try:
+                send_email(enseignant.email)
+            except:
+                return {"error":"Unable to send email!"}
             db.session.commit()
             result = enseignant_schema.dump(enseignant).data
             return { "status": 'success', 'data': result }, 201
         else:
+##            try:
+##            Etudiants.try_login(id, password)
+##            except ldap.INVALID_CREDENTIALS:
+##                return {'ldap': 'Invalid Credentials!'}, 49
             etudiant = Etudiants(
                 id = data['id'],
                 prenom = data['prenom'],
@@ -44,7 +55,10 @@ class SignupResource(Resource):
                 email = data['email']
                 )
             db.session.add(etudiant)
-            send_email(etudiant.email)
+            try:
+                send_email(etudiant.email)
+            except:
+                return {"error":"Unable to send email!"}
             db.session.commit()
             result = etudiant_schema.dump(etudiant).data
             return { "status": 'success', 'data': result }, 201

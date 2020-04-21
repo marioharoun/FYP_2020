@@ -1,6 +1,5 @@
 from flask import Blueprint
 from flask_restful import Api
-from flask_oauthlib.provider import OAuth2Provider
 from resources.Hello import Hello
 from resources.Presence import PresenceResource
 from resources.Absence import AbsenceResource
@@ -9,6 +8,7 @@ from resources.Login import LoginResource
 from resources.Createsession import CreatesessionResource
 from resources.Lecon import LeconResource
 from resources.ConfirmEmail import ConfirmEmailResource
+from resources.Diffuseur import DiffuseurResource
 
 api_bp = Blueprint('api', __name__)
 api = Api(api_bp)
@@ -40,4 +40,11 @@ confirmation = Api(confirmation_bp)
 
 # Route
 confirmation.add_resource(ConfirmEmailResource,'/')
+
+
+diffuseur_bp = Blueprint('diffuseur', __name__)
+diffuseur = Api(diffuseur_bp)
+
+# Route
+diffuseur.add_resource(DiffuseurResource,'/')
 

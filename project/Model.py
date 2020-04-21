@@ -7,6 +7,7 @@ from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
+import ldap
 
 ma = Marshmallow()
 db = SQLAlchemy()
@@ -18,6 +19,10 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()
 ##
+
+def get_ldap_connection():
+    conn = ldap.initialize(app.config['LDAP_PROVIDER_URL'])
+    return conn
 
 class Etudiants(db.Model):
     __tablename__ = 'etudiants'
@@ -31,6 +36,10 @@ class Etudiants(db.Model):
     confirmation = db.Column(db.Boolean, unique=False, default=False)
     presence = db.relationship('Presence', backref='presence_etudiants')
     absence = db.relationship('Absence', backref='absence_etudiants')
+    @staticmethod
+    def try_login(id, password):
+        conn = get_ldap_connection()
+        conn.simple_bind_s('cn=%s,ou=Etudiants,dc=testathon,dc=net' % id,password)
 
 class Enseignants(db.Model):
     __tablename__ = 'enseignants'
@@ -42,6 +51,10 @@ class Enseignants(db.Model):
     email = db.Column(db.String(80), unique=True)
     confirmation = db.Column(db.Boolean, unique=False, default=False)
     lecon = db.relationship('Lecons', backref='lecon_enseignant')
+    @staticmethod
+    def try_login(id, password):
+        conn = get_ldap_connection()
+        conn.simple_bind_s('cn=%s,ou=Enseignants,dc=testathon,dc=net' % id,password)
 
 class Lecons(db.Model):
     __tablename__ = 'lecons'
@@ -58,12 +71,10 @@ class Salles(db.Model):
     __tablename__ = 'salles'
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(db.String(128)) #ou db.Column(UUID(as_uuid=True), unique=True, nullable=False)
-    nom_salle = db.Column(db.String(45), nullable=False)
+    major = db.Column(db.Integer, unique=True)
+    minor = db.Column(db.Integer)
+    nom_salle = db.Column(db.String(45))
     session = db.relationship('Session', backref='session_salles')
-
-    def __init__(self, diffuseur_uuid, nom_salle):
-        self.diffuseur_uuid = diffuseur_uuid
-        self.nom_salle = nom_salle
 
 class Session(db.Model):
     __tablename__ = 'session'
@@ -134,5 +145,6 @@ class AbsenceSchema(ma.Schema):
     etudiant_id = fields.Integer(required=True)
 
 class SalleSchema(ma.Schema):
-    uuid = fields.String(required=True)
-    
+    major = fields.Integer(required=True)
+    minor = fields.Integer(required=True)
+    salles = fields.String()
