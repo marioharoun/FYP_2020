@@ -33,15 +33,35 @@ class PresenceResource(Resource):
         data, errors = presence_schema.load(json_data)
         if errors:
             return errors, 422
-        uuid = Salles.query.filter_by(uuid=data['uuid']).first()
-        if not uuid:
-            return {'message': 'UUID invalide'}, 400
+        if current_user[0].id!=data['etudiant_id']:
+            return {'message': 'Access denied!'}, 403
         
-        etudiant = Etudiants.query.filter_by(id=json_data['etudiant_id']).first()
-        if etudiant.mac_address != None and json_data['mac_address'] != etudiant.mac_address:
-            return {'message': 'Invalid device'}, 400
-        print(etudiant.mac_address)
-        etudiant.mac_address = json_data['mac_address']
+        entries = len(db.session.query(Presence).filter(Presence.etudiant_id == data['etudiant_id'],
+                                               Presence.session_id == data['session_id']).all())
+        if not (entries <= 2):
+            return {'message': 'Exceeded number of entries for the session!'}, 400
+        
+        salle = Salles.query.filter_by(uuid=data['uuid']).first()
+        if not salle:
+            return {'message': 'UUID invalide'}, 400
+        salle = Salles.query.filter_by(major=data['major']).first()
+        session = Session.query.filter_by(id=data['session_id']).first()
+        if not salle:
+            return {'message': 'Wrong class!'}, 400
+        elif salle.id != session.salles_id:
+            return {'message': 'Wrong class!'}, 400
+        elif salle.minor != data['minor']:
+            return {'message': 'Invalid data!'}, 400
+        
+        etudiant = Etudiants.query.filter_by(id=data['etudiant_id']).first()
+        etudiant1 = Etudiants.query.filter_by(mac_address=data['mac_address']).all()
+        if etudiant1 == []:
+            etudiant.mac_address = data['mac_address']
+        elif etudiant.mac_address != None and etudiant1 != []:
+            for i in etudiant1:
+                if i.id != data['etudiant_id']:
+                    return {'message': 'Invalid device!'}, 400
+        
         db.session.commit()
 
         presence = Presence(

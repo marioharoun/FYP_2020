@@ -88,12 +88,10 @@ class Session(db.Model):
 
 class Presence(db.Model):
     __tablename__ = 'presence'
+    id = db.Column(db.Integer, primary_key=True)
     session_id = db.Column(db.Integer, db.ForeignKey('session.id') ,nullable=False)
     etudiant_id = db.Column(db.Integer, db.ForeignKey('etudiants.id'),nullable=False)
     date_message = db.Column(db.Date, nullable=False)
-    __table_args__ = (
-        db.PrimaryKeyConstraint('session_id','etudiant_id'),
-        {},)
 
 class Absence(db.Model):
     __tablename__ = 'absence'
@@ -138,6 +136,8 @@ class PresenceSchema(ma.Schema):
     etudiant_id = fields.Integer(required=True)
     date_message = fields.DateTime(required=True)
     uuid = fields.String(required=True)
+    major = fields.Integer(required=True)
+    minor = fields.Integer(required=True)
     mac_address = fields.String(required=True)
 
 class AbsenceSchema(ma.Schema):
