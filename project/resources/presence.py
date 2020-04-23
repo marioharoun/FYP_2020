@@ -61,6 +61,8 @@ class PresenceResource(Resource):
             for i in etudiant1:
                 if i.id != data['etudiant_id']:
                     return {'message': 'Invalid device!'}, 400
+        elif etudiant.mac_address = None:
+            etudiant.mac_address = data['mac_address']
         
         db.session.commit()
 
