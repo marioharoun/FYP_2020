@@ -92,6 +92,9 @@ class Presence(db.Model):
     session_id = db.Column(db.Integer, db.ForeignKey('session.id') ,nullable=False)
     etudiant_id = db.Column(db.Integer, db.ForeignKey('etudiants.id'),nullable=False)
     date_message = db.Column(db.Date, nullable=False)
+    major = db.Column(db.Integer)
+    minor = db.Column(db.Integer)
+    
 
 class Absence(db.Model):
     __tablename__ = 'absence'

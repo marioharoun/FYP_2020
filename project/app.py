@@ -9,6 +9,9 @@ from resources.Createsession import CreatesessionResource
 from resources.Lecon import LeconResource
 from resources.ConfirmEmail import ConfirmEmailResource
 from resources.Diffuseur import DiffuseurResource
+from resources.GetEtudiants import GetEtudiantsResource
+from resources.GetSessions import GetSessionsResource
+
 
 api_bp = Blueprint('api', __name__)
 api = Api(api_bp)
@@ -19,6 +22,9 @@ api.add_resource(PresenceResource, '/Presence')
 api.add_resource(AbsenceResource, '/Absence')
 api.add_resource(CreatesessionResource, '/Createsession')
 api.add_resource(LeconResource, '/Lecon')
+api.add_resource(GetEtudiantsResource, '/Etudiant')
+api.add_resource(GetSessionsResource, '/Session')
+
 
 
 login_bp = Blueprint('login', __name__)

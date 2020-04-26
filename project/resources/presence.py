@@ -35,11 +35,14 @@ class PresenceResource(Resource):
             return errors, 422
         if current_user[0].id!=data['etudiant_id']:
             return {'message': 'Access denied!'}, 403
-        
-        entries = len(db.session.query(Presence).filter(Presence.etudiant_id == data['etudiant_id'],
-                                               Presence.session_id == data['session_id']).all())
-        if not (entries <= 2):
-            return {'message': 'Exceeded number of entries for the session!'}, 400
+        entries = Presence.query.filter_by(etudiant_id=data['etudiant_id'],
+                                           session_id=data['session_id']).all()
+        num_entries = len(entries)
+        if entries != []:
+            if entries[num_entries - 1].minor == data['minor']:
+                return {'message': 'Wait for another submission!'}, 400
+            if not (num_entries <= 2):
+                return {'message': 'Exceeded number of entries for the session!'}, 400
         
         salle = Salles.query.filter_by(uuid=data['uuid']).first()
         if not salle:
@@ -57,19 +60,21 @@ class PresenceResource(Resource):
         etudiant1 = Etudiants.query.filter_by(mac_address=data['mac_address']).all()
         if etudiant1 == []:
             etudiant.mac_address = data['mac_address']
-        elif etudiant.mac_address != None and etudiant1 != []:
+        elif etudiant1 != [] and etudiant.mac_address != []:
             for i in etudiant1:
                 if i.id != data['etudiant_id']:
                     return {'message': 'Invalid device!'}, 400
-        elif etudiant.mac_address = None:
-            etudiant.mac_address = data['mac_address']
+        elif etudiant1 != [] and etudiant.mac_address == []:
+            return {'message': 'Invalid device!'}, 400
         
         db.session.commit()
 
         presence = Presence(
             session_id=data['session_id'],
             etudiant_id=data['etudiant_id'],
-            date_message=data['date_message']
+            date_message=data['date_message'],
+            major=data['major'],
+            minor=data['minor']
             )
         
         db.session.add(presence)

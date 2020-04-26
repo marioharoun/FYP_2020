@@ -25,6 +25,9 @@ class SignupResource(Resource):
 ##            Enseignants.try_login(id, password)
 ##            except ldap.INVALID_CREDENTIALS:
 ##                return {'ldap': 'Invalid Credentials!'}, 49
+            email = Enseignants.query.filter_by(email = data['email']).all()
+            if email != []:
+                return {'message': 'Email already exists!'}, 400
             enseignant = Enseignants(
                 id = data['id'],
                 prenom = data['prenom'],
@@ -46,6 +49,9 @@ class SignupResource(Resource):
 ##            Etudiants.try_login(id, password)
 ##            except ldap.INVALID_CREDENTIALS:
 ##                return {'ldap': 'Invalid Credentials!'}, 49
+            email = Etudiants.query.filter_by(email = data['email']).all()
+            if email != []:
+                return {'message': 'Email already exists!'}, 400
             etudiant = Etudiants(
                 id = data['id'],
                 prenom = data['prenom'],
