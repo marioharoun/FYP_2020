@@ -6,6 +6,8 @@ from .Login import token_required
 presences_schema = PresenceSchema(many=True)
 presence_schema = PresenceSchema()
 
+
+
 etudiants_schema = EtudiantSchema(many=True)
 etudiant_schema = EtudiantSchema()
 
@@ -84,36 +86,28 @@ class PresenceResource(Resource):
 
         return { "status": 'success', 'data': result }, 201
 
-    def put(self):
-        json_data = request.get_json(force=True)
-        if not json_data:
-               return {'message': 'No input data provided'}, 400
-        # Validate and deserialize input
-        data, errors = category_schema.load(json_data)
-        if errors:
-            return errors, 422
-        category = Category.query.filter_by(id=data['id']).first()
-        if not category:
-            return {'message': 'Category does not exist'}, 400
-        category.name = data['name']
-        db.session.commit()
-
-        result = category_schema.dump(category).data
-
-        return { "status": 'success', 'data': result }, 204
-
-    def delete(self):
-        json_data = request.get_json(force=True)
-        if not json_data:
-               return {'message': 'No input data provided'}, 400
-        # Validate and deserialize input
-        data, errors = category_schema.load(json_data)
-        if errors:
-            return errors, 422
-        category = Category.query.filter_by(id=data['id']).delete()
-        db.session.commit()
-
-        result = category_schema.dump(category).data
-
-        return { "status": 'success', 'data': result}, 204
+    @token_required
+    def delete(current_user, self):
+        if current_user[1]==False:
+            return {'message': 'Access Denied!'}, 403
+        session_id=request.args.get('session_id')
+        etudiant_id=request.args.get('etudiant_id')
+        
+        if etudiant_id != None and session_id == None:
+            query = Presence.query.filter_by(etudiant_id= etudiant_id).all()
+        elif etudiant_id == None and session_id == None:
+            return { 'message': 'No arguments included!'}, 400
+        elif etudiant_id == None and session_id != None:
+            query = Presence.query.filter_by(session_id= session_id).all()
+        else:
+            query = Presence.query.filter_by(session_id= session_id,
+                                             etudiant_id= etudiant_id).all()
+            
+        if query:
+            for i in query:
+                db.session.delete(i)
+            db.session.commit()
+            return { 'message': 'Resource deleted successfully!'}, 200
+        else:
+            return { 'message': 'Failed to delete resource!'}, 400
 

@@ -151,3 +151,4 @@ class SalleSchema(ma.Schema):
     major = fields.Integer(required=True)
     minor = fields.Integer(required=True)
     salles = fields.String()
+    
