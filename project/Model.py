@@ -8,6 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 import ldap
+from config import LDAP_PROVIDER_URL
 
 ma = Marshmallow()
 db = SQLAlchemy()
@@ -21,7 +22,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 ##
 
 def get_ldap_connection():
-    conn = ldap.initialize(app.config['LDAP_PROVIDER_URL'])
+    conn = ldap.initialize(LDAP_PROVIDER_URL)
     return conn
 
 class Etudiants(db.Model):
@@ -39,7 +40,8 @@ class Etudiants(db.Model):
     @staticmethod
     def try_login(id, password):
         conn = get_ldap_connection()
-        conn.simple_bind_s('cn=%s,ou=Etudiants,dc=testathon,dc=net' % id,password)
+        conn.simple_bind_s('cn=%s,ou=Users,dc=testathon,dc=net' % email, password)
+        #conn.simple_bind_s('cn=read-only-admin,dc=example,dc=com','password')
 
 class Enseignants(db.Model):
     __tablename__ = 'enseignants'
@@ -91,7 +93,7 @@ class Presence(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     session_id = db.Column(db.Integer, db.ForeignKey('session.id') ,nullable=False)
     etudiant_id = db.Column(db.Integer, db.ForeignKey('etudiants.id'),nullable=False)
-    date_message = db.Column(db.Date, nullable=False)
+    date_message = db.Column(db.DateTime, nullable=False)
     major = db.Column(db.Integer)
     minor = db.Column(db.Integer)
     
@@ -137,7 +139,6 @@ class LeconSchema(ma.Schema):
 class PresenceSchema(ma.Schema):
     session_id = fields.Integer(required=True)
     etudiant_id = fields.Integer(required=True)
-    date_message = fields.DateTime(required=True)
     uuid = fields.String(required=True)
     major = fields.Integer(required=True)
     minor = fields.Integer(required=True)

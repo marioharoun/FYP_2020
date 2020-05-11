@@ -51,6 +51,5 @@ confirmation.add_resource(ConfirmEmailResource,'/')
 diffuseur_bp = Blueprint('diffuseur', __name__)
 diffuseur = Api(diffuseur_bp)
 
-# Route
-diffuseur.add_resource(DiffuseurResource,'/')
+
 

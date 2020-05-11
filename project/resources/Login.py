@@ -45,12 +45,12 @@ class LoginResource(Resource):
                 return {'message' : 'Email not confirmed!'}
             if check_password_hash(enseignant.password, auth.password):
                 token = jwt.encode({'public_id' : enseignant.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=75)}, SECRET_KEY)
-                return {'token' : token.decode('UTF-8')}
+                return token.decode('UTF-8')
         if etudiant:
             if etudiant.confirmation == False:
                 return {'message' : 'Email not confirmed!'}
             if check_password_hash(etudiant.password, auth.password):
                 token = jwt.encode({'public_id' : etudiant.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=75)}, SECRET_KEY)
-                return {'token' : token.decode('UTF-8')}
+                return token.decode('UTF-8')
 
         return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm=Login required!'})

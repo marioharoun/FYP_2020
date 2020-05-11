@@ -70,6 +70,7 @@ class PresenceResource(Resource):
             return {'message': 'Invalid device!'}, 400
         
         db.session.commit()
+        print(json_data['date_message'])
 
         presence = Presence(
             session_id=data['session_id'],

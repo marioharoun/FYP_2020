@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from Model import db, Etudiants, EtudiantSchema, Enseignants, EnseignantSchema, SignupSchema
 import uuid
 from .ConfirmEmail import send_email
+import ldap
 
 signup_schema = SignupSchema()
 etudiant_schema = EtudiantSchema()
@@ -21,10 +22,10 @@ class SignupResource(Resource):
         hashed_password = generate_password_hash(data['password'], method='sha256')
         
         if data['enseignant'] == True:
-##            try:
-##            Enseignants.try_login(id, password)
-##            except ldap.INVALID_CREDENTIALS:
-##                return {'ldap': 'Invalid Credentials!'}, 49
+            try:
+                Enseignants.try_login(data['email'], data['password'])
+            except ldap.INVALID_CREDENTIALS:
+                return {'ldap': 'Invalid Credentials!'}, 49
             email = Enseignants.query.filter_by(email = data['email']).all()
             if email != []:
                 return {'message': 'Email already exists!'}, 400
@@ -45,10 +46,10 @@ class SignupResource(Resource):
             result = enseignant_schema.dump(enseignant).data
             return { "status": 'success', 'data': result }, 201
         else:
-##            try:
-##            Etudiants.try_login(id, password)
-##            except ldap.INVALID_CREDENTIALS:
-##                return {'ldap': 'Invalid Credentials!'}, 49
+            try:
+                Etudiants.try_login(data['email'], data['password'])
+            except ldap.INVALID_CREDENTIALS:
+                return {'ldap': 'Invalid Credentials!'}, 49
             email = Etudiants.query.filter_by(email = data['email']).all()
             if email != []:
                 return {'message': 'Email already exists!'}, 400
