@@ -29,7 +29,6 @@ class CreatesessionResource(Resource):
         session = Session(
             salles_id=data['salles_id'],
             date_debut=data['date_debut'],
-            date_fin=data['date_fin'],
             lecons_id=data['lecons_id'],
             )
         
@@ -39,4 +38,4 @@ class CreatesessionResource(Resource):
         result = sessions_schema.dump(session).data
         result = result[len(result)-1]
 
-        return { "status": 'success', 'data': result }, 201
+        return 'Le numero de la seance est: ' +str(result['id']), 201

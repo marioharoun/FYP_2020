@@ -40,8 +40,8 @@ class Etudiants(db.Model):
     @staticmethod
     def try_login(id, password):
         conn = get_ldap_connection()
-        conn.simple_bind_s('cn=%s,ou=Users,dc=testathon,dc=net' % email, password)
-        #conn.simple_bind_s('cn=read-only-admin,dc=example,dc=com','password')
+        #conn.simple_bind_s('cn=%s,ou=Users,dc=testathon,dc=net' % email, password)
+        conn.simple_bind_s('cn=read-only-admin,dc=example,dc=com','password')
 
 class Enseignants(db.Model):
     __tablename__ = 'enseignants'
@@ -56,7 +56,8 @@ class Enseignants(db.Model):
     @staticmethod
     def try_login(id, password):
         conn = get_ldap_connection()
-        conn.simple_bind_s('cn=%s,ou=Enseignants,dc=testathon,dc=net' % id,password)
+        #conn.simple_bind_s('cn=%s,ou=Users,dc=testathon,dc=net' % email, password)
+        conn.simple_bind_s('cn=read-only-admin,dc=example,dc=com','password')
 
 class Lecons(db.Model):
     __tablename__ = 'lecons'
@@ -83,8 +84,8 @@ class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     lecons_id = db.Column(db.Integer, db.ForeignKey('lecons.id'), nullable=False)
     salles_id = db.Column(db.Integer, db.ForeignKey('salles.id'), nullable=False)
-    date_debut = db.Column(db.Date, nullable=False)
-    date_fin = db.Column(db.Date, nullable=False)
+    date_debut = db.Column(db.DateTime, nullable=False)
+    date_fin = db.Column(db.DateTime)
     presence = db.relationship('Presence', backref='presence_session')
     absence = db.relationship('Absence', backref='absence_session')
 
@@ -92,7 +93,8 @@ class Presence(db.Model):
     __tablename__ = 'presence'
     id = db.Column(db.Integer, primary_key=True)
     session_id = db.Column(db.Integer, db.ForeignKey('session.id') ,nullable=False)
-    etudiant_id = db.Column(db.Integer, db.ForeignKey('etudiants.id'),nullable=False)
+    etudiant_id = db.Column(db.Integer, db.ForeignKey('etudiants.id'))
+    etudiant_id_non_registre = db.Column(db.Integer)
     date_message = db.Column(db.DateTime, nullable=False)
     major = db.Column(db.Integer)
     minor = db.Column(db.Integer)
@@ -127,7 +129,6 @@ class SessionSchema(ma.Schema):
     id = fields.Integer()
     salles_id = fields.Integer(required=True)
     date_debut = fields.DateTime(required=True)
-    date_fin = fields.DateTime(required=True)
     lecons_id = fields.Integer(required=True)
 
 class LeconSchema(ma.Schema):
@@ -140,11 +141,12 @@ class PresenceSchema(ma.Schema):
     session_id = fields.Integer(required=True)
     etudiant_id = fields.Integer(required=True)
     uuid = fields.String(required=True)
+    date_message = fields.DateTime(required=True)############### Differs in heroku
     major = fields.Integer(required=True)
     minor = fields.Integer(required=True)
     mac_address = fields.String(required=True)
 
-class AbsenceSchema(ma.Schema):
+class PresenceSchema_2(ma.Schema):
     session_id = fields.Integer(required=True)
     etudiant_id = fields.Integer(required=True)
 

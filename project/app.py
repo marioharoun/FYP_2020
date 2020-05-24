@@ -2,7 +2,6 @@ from flask import Blueprint
 from flask_restful import Api
 from resources.Hello import Hello
 from resources.Presence import PresenceResource
-from resources.Absence import AbsenceResource
 from resources.Signup import SignupResource
 from resources.Login import LoginResource
 from resources.Createsession import CreatesessionResource
@@ -19,7 +18,6 @@ api = Api(api_bp)
 # Route
 api.add_resource(Hello, '/Hello')
 api.add_resource(PresenceResource, '/Presence')
-api.add_resource(AbsenceResource, '/Absence')
 api.add_resource(CreatesessionResource, '/Createsession')
 api.add_resource(LeconResource, '/Lecon')
 api.add_resource(GetEtudiantsResource, '/Etudiant')
@@ -50,6 +48,9 @@ confirmation.add_resource(ConfirmEmailResource,'/')
 
 diffuseur_bp = Blueprint('diffuseur', __name__)
 diffuseur = Api(diffuseur_bp)
+
+# Route
+diffuseur.add_resource(DiffuseurResource,'/')
 
 
 
